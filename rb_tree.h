@@ -1,5 +1,5 @@
-#ifndef TREE
-#define TREE
+#ifndef RB_TREE
+#define RB_TREE
 #include <cassert>
 #include <memory>
 /*

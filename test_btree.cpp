@@ -2,21 +2,24 @@
 #include "btree.h"
 #include <vector>
 #include <cstdlib>
-
-void  CreateRandomVector (std::vector<int> vectToModify) {
-	for (int index=0; index<(int)vectToModify.size(); index++) {
-		vectToModify[index] = (int) std::rand() % 100;
-	}
-
-}
+#include <algorithm>
+#include <string>
+#include <ctime>
 
 int main () {
 	std::vector<int> inputVector(20);
-	CreateRandomVector(inputVector);
 	collections::BTree<int> tree = collections::BTree<int>();
-	
+	std::srand(std::time(0)); 
+
+	std::for_each(inputVector.begin(), inputVector.end(), [](int &n){ n = (int) std::rand() % 100; });
+//	std::for_each(inputVector.begin(), inputVector.end(), [](int &n){ std::cout<<"value="<<n<<std::endl; });
+
 	for (int index=0; index< (int)inputVector.size() ; index++) {
-		tree.insert(inputVector[index]);
+		std::cout << "Insert new node: "<<inputVector[index]<<std::endl;
+		tree = tree.insert(inputVector[index]);
 	}
+	tree.print();
+
+	
 
 }

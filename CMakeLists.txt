@@ -12,11 +12,12 @@ add_subdirectory("./gmock-1.7.0")
 
 #Add flags
 #Debug flags
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -ggdb")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -DNDEBUG")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -ggdb")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -DNDEBUG")
 # Target system
 set( SRCFILES
-	./test_thread3.cpp       	
+	./test_btree.cpp
+	#./test_thread3.cpp       	
 	#./test_thread2.cpp       	
 	#./test_thread1.cpp       	
 	#test1.cpp
