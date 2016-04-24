@@ -16,7 +16,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -ggdb")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -DNDEBUG")
 # Target system
 set( SRCFILES
-	./test_btree.cpp
+	#./test_btree.cpp
 	#./test_thread3.cpp       	
 	#./test_thread2.cpp       	
 	#./test_thread1.cpp       	
