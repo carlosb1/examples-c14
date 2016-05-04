@@ -7,28 +7,26 @@ using namespace std;  // since cin and cout are both in namespace std, this save
 
 
 int change_base(int value, int base) {
-	std::vector<int> mults;
-	while (value >=base) {
-		int rest = value % base;
-		value = ((value-rest) / base);
-		mults.push_back(rest);
-	}
-	int acum_value=0;
-	for (int index = mults.size(); index >=0; index--) {
-		int mult = mults[index];
-		acum_value+=mult*pow(base,index);
+	int acum_value = 0;
+	int index = 0;
+	while (value > 0) {
+		int rem = value & 1; 
+		value = (value) / 2;
+		acum_value+= rem * pow(base,index);
+		index++;
 	}
 
 	return acum_value;
 	
 }
-bool is_prime(int num) {
+bool is_prime(int num, int & result) {
 	int count = 0;
 	for(int i=2;i<=num/2;i++){
 	     if(num%i==0){
 		count++;
+	     	result = i;
 		break;
-	     }
+	     } 
         }
         return(count==0 && num!= 1);
 
@@ -63,15 +61,15 @@ int main() {
 	unsigned int loop_value = init_value;
 	int count = 0;
 	while (number_of_found!=j) {
-				
 		/* find */
+		//cout << dec_to_bin(loop_value) << '\n';
 		for (int base = 2; base < 11; base++) {
 			int new_value_base = change_base(loop_value,base);
-//			cout << new_value_base << '\n';
-			if  (is_prime(new_value_base)) {
+			int divisor = 0;
+			if  (is_prime(new_value_base,divisor)) {
 				break;					
 			}
-			number_values.push_back(new_value_base);
+			number_values.push_back(divisor);
 		}
 		if (number_values.size() == 9) {
 			number_of_found+=1;
@@ -81,7 +79,6 @@ int main() {
 			}
 			cout << '\n';
 		}
-				
 		number_values.clear();
 				
 		/* next correct binary to analyse*/	
