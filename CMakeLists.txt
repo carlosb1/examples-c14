@@ -9,6 +9,8 @@ include_directories ("./gmock-1.7.0/include")
 include_directories ("./gmock-1.7.0/gtest/include")
 add_subdirectory("./gmock-1.7.0")
 
+include_directories ("./algorithms")
+
 
 #Add flags
 #Debug flags
@@ -16,7 +18,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -ggdb")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -DNDEBUG")
 # Target system
 set( SRCFILES
-	./main_inheritance.cpp
+	./algorithms/client_search.cpp
+	#./main_inheritance.cpp
 	#./google_code_jam_qual13.cpp
 	#./test_btree.cpp
 	#./test_thread3.cpp       	
