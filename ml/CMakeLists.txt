@@ -12,11 +12,10 @@ include_directories ("./include")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -DNDEBUG -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_LTO=true")
 # Target system
 set( SRCFILES
-	./algorithms/multithread_client_search.cpp
-	
+	./test_classifier.cpp	
 	)
 
 add_executable(test ${SRCFILES} )
 #TODO Add find_library for each  link
-#target_link_libraries (test gtest gmock pthread )
+#target_link_libraries (test  pthread )
 target_link_libraries (test benchmark pthread )
