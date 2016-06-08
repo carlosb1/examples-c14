@@ -3,6 +3,8 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <numeric>
+#include <algorithm>
 
 namespace ml {
 	
@@ -15,6 +17,29 @@ namespace ml {
 		
 	};
 	typedef std::map<std::string,GaussianInfo> Row;
+
+	/**
+	 * Implements mean function
+	 * @param values vector of values
+	 * */
+	inline double mean(std::vector<float> values) {
+		double sum = std::accumulate(values.begin(), values.end(), 0.0);
+		return sum / values.size();
+	}
+
+
+	/**
+	 * Calculates variance value from a set of number and their mean
+	 * @param mean mean of numbers
+	 * @param set of values to get variance
+	 * */
+	inline double variance (double mean, std::vector<float> values) {
+		std::vector<double> diff(values.size());
+		std::transform(values.begin(), values.end(), diff.begin(), [mean](double x) { return x - mean; });
+		double sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+		return std::sqrt(sq_sum / values.size());
+	}
+
 	class NaiveBayesClassifier {
 
 		private:
