@@ -63,9 +63,21 @@ namespace ml {
 					//TODO set up a correct constructor
 					Row row;
 					GaussianInfo gaussianInfo;
-					gaussianInfo.values.push_back(sample.second);
-					gaussianInfo.mean = sample.second;
-					gaussianInfo.variance = sample.second;
+					if (this->gaussianTable.find(key) == this->gaussianTable.end()) {
+						gaussianInfo.values.push_back(sample.second);
+						gaussianInfo.mean = sample.second;
+						gaussianInfo.variance = sample.second;
+					}
+					else {
+						row = this->gaussianTable[key];
+						gaussianInfo = row[sample.first];
+						gaussianInfo.values.push_back(sample.second);
+						double mean = ml::mean(gaussianInfo.values);
+						double variance = ml::variance(mean,gaussianInfo.values);
+						gaussianInfo.mean = mean;
+						gaussianInfo.variance = variance;
+
+					}
 					row[sample.first]= gaussianInfo;
 					this->gaussianTable[key]=row;
 				}
