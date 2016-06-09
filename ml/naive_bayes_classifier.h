@@ -46,10 +46,10 @@ namespace ml {
 			std::vector<std::pair<std::string,Sample>> recollectedData; 
 			std::map<std::string,std::map<std::string,GaussianInfo>> gaussianTable; 
 		public:		
-			inline void addRow(std::string & type, Sample & param) {
+			inline void addRow(std::string type, Sample & param) {
 				this->recollectedData.push_back(std::make_pair(type,param));
 			};
-			inline GaussianInfo getGaussianInfo(std::string & type, std::string & parameter) {
+			inline GaussianInfo getGaussianInfo(std::string type, std::string parameter) {
 				//TODO add checker
 				return gaussianTable[type][parameter];
 
