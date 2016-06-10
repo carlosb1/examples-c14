@@ -5,6 +5,7 @@
 #include <string>
 #include <numeric>
 #include <algorithm>
+#include <iostream>
 
 namespace ml {
 	
@@ -14,6 +15,20 @@ namespace ml {
 		double mean;
 		double variance;
 		std::vector<float> values;
+		bool isNull;
+		GaussianInfo(float value) {
+			values.push_back(value);
+			mean = value;
+			variance = value;
+			isNull = false;
+
+		}
+		
+
+		
+		GaussianInfo() {
+			isNull=true;
+		}
 		
 	};
 	typedef std::map<std::string,GaussianInfo> Row;
@@ -50,7 +65,16 @@ namespace ml {
 				this->recollectedData.push_back(std::make_pair(type,param));
 			};
 			inline GaussianInfo getGaussianInfo(std::string type, std::string parameter) {
-				//TODO add checker
+				/* Guards */
+				if (gaussianTable.find(type) == gaussianTable.end()) {
+					return GaussianInfo();
+				}
+
+				std::map<std::string,GaussianInfo> info = gaussianTable[type];
+				if (info.find(parameter) == info.end()) {
+					return GaussianInfo();
+				}
+
 				return gaussianTable[type][parameter];
 
 			}
@@ -64,9 +88,7 @@ namespace ml {
 					Row row;
 					GaussianInfo gaussianInfo;
 					if (this->gaussianTable.find(key) == this->gaussianTable.end()) {
-						gaussianInfo.values.push_back(sample.second);
-						gaussianInfo.mean = sample.second;
-						gaussianInfo.variance = sample.second;
+						gaussianInfo = GaussianInfo(sample.second);
 					}
 					else {
 						row = this->gaussianTable[key];

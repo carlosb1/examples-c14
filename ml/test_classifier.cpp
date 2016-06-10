@@ -4,13 +4,13 @@
 
 TEST_CASE("Add row correctly","[naive_bayes_classifier]") {
 	ml::NaiveBayesClassifier classifier;
-	std::string type("male");
 	const float inputData = 1;
 	ml::Sample sample = std::make_pair("height",inputData);
-	classifier.addRow(type,sample);
+	classifier.addRow("male",sample);
+
+	//TODO move this test
 	classifier.train();
-	std::string param("height");
-	ml::GaussianInfo info = classifier.getGaussianInfo(type,param);
+	ml::GaussianInfo info = classifier.getGaussianInfo("male","height");
 	REQUIRE(info.mean == inputData);
 	REQUIRE(info.values[0] == inputData);
 	REQUIRE(info.variance ==  inputData);
