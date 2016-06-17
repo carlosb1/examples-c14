@@ -1,37 +1,40 @@
 #define CATCH_CONFIG_MAIN
+#include "vector"
 #include "catch.hpp"
 #include "naive_bayes_classifier.h"
-
-TEST_CASE("Add row correctly","[naive_bayes_classifier]") {
-	ml::NaiveBayesClassifier classifier;
-	const float inputData = 1;
-	ml::Sample sample = std::make_pair("height",inputData);
-	classifier.addRow("male",sample);
-
-	//TODO isolate testing
-	classifier.train();
-	ml::GaussianInfo info = classifier.getGaussianInfo("male","height");
-	REQUIRE(info.mean == inputData);
-	REQUIRE(info.values[0] == inputData);
-	REQUIRE(info.variance ==  inputData);
-};
 
 ml::Sample createSample (std::string param, float value) {
 	return std::make_pair(param,value);
 }
+void insertSamples(ml::NaiveBayesClassifier & classifier,std::string type,  std::string param, std::vector<float> values) {
+	for (auto value: values) {
+		ml::Sample sample = createSample(param,value);
+		classifier.addRow(type,sample);
+	}
+}
+
+TEST_CASE("Add row correctly","[naive_bayes_classifier]") {
+	ml::NaiveBayesClassifier classifier;
+	
+	std::vector<float> v {1.};
+	insertSamples(classifier,"male","height",v);	
+
+	//TODO isolate testing
+	classifier.train();
+	ml::GaussianInfo info = classifier.getGaussianInfo("male","height");
+	REQUIRE(info.mean == 1.);
+	REQUIRE(info.values[0] == 1.);
+	REQUIRE(info.variance ==  1.);
+};
+
 
 TEST_CASE("Add two rows correctly","[naive_bayes_classifier]") {
 	//TODO ADD SETUP
 	ml::NaiveBayesClassifier classifier;
 
-	//TODO add method to automatise the creation
-	// of samples and added them
+	std::vector<float> v {1., 1.5};
+	insertSamples(classifier,"male","height",v);	
 	
-	ml::Sample sample = createSample("height",1);
-	classifier.addRow("male",sample);
-	
-	ml::Sample sample2 = createSample("height",1.5);
-	classifier.addRow("male",sample2);
 
 	classifier.train();
 	ml::GaussianInfo info = classifier.getGaussianInfo("male","height");
@@ -47,16 +50,13 @@ TEST_CASE("Add different type of samples for testing test","[naive_bayes_classif
 	//TODO ADD SETUP
 	ml::NaiveBayesClassifier classifier;
 
-	ml::Sample sample = createSample("height",1);
-	classifier.addRow("male",sample);	
-	ml::Sample sample2 = createSample("height",1.5);
-	classifier.addRow("male",sample2);
+	std::vector<float> v {1., 1.5};
+	insertSamples(classifier,"male","height",v);	
+	
+	std::vector<float> v2 {1.};
+	insertSamples(classifier,"male","weight",v2);	
 
 	//TODO add test for not finding type of sample
-	ml::Sample sample3 = createSample("weight",1);
-	classifier.addRow("male",sample3);
-
-
 
 	classifier.train();
 	ml::GaussianInfo info = classifier.getGaussianInfo("male","weight");
