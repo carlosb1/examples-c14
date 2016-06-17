@@ -47,7 +47,6 @@ TEST_CASE("testing add information","[naive_bayes_classifier]") {
 		std::vector<float> v2 {1.};
 		insertSamples(classifier,"male","weight",v2);	
 	
-		//TODO add test for not finding type of sample
 	
 		classifier.train();
 		ml::GaussianInfo info = classifier.getGaussianInfo("male","weight");
@@ -57,6 +56,13 @@ TEST_CASE("testing add information","[naive_bayes_classifier]") {
 		REQUIRE(info.values[0] == 1);
 		REQUIRE(info.variance ==  0 );
 		REQUIRE(info.mean ==  1 );
+	};
+
+	
+	SECTION("It doesn't exist the sample") {
+		classifier.train();
+		ml::GaussianInfo info = classifier.getGaussianInfo("male","weight");
+		REQUIRE(info.values.size() == 0);
 	};
 
 };
