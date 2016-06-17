@@ -43,16 +43,13 @@ TEST_CASE("testing add information","[naive_bayes_classifier]") {
 	SECTION("Add different type of samples for testing test") {
 		std::vector<float> v {1., 1.5};
 		insertSamples(classifier,"male","height",v);	
-		
 		std::vector<float> v2 {1.};
 		insertSamples(classifier,"male","weight",v2);	
 	
-	
 		classifier.train();
 		ml::GaussianInfo info = classifier.getGaussianInfo("male","weight");
-	
-		REQUIRE(info.values.size() == 1);
 		
+		REQUIRE(info.values.size() == 1);
 		REQUIRE(info.values[0] == 1);
 		REQUIRE(info.variance ==  0 );
 		REQUIRE(info.mean ==  1 );
@@ -63,6 +60,25 @@ TEST_CASE("testing add information","[naive_bayes_classifier]") {
 		classifier.train();
 		ml::GaussianInfo info = classifier.getGaussianInfo("male","weight");
 		REQUIRE(info.values.size() == 0);
+	};
+	
+	SECTION("Add multiple types for testing with a sample ") {
+		std::vector<float> v {1};
+		insertSamples(classifier,"male","height",v);	
+		std::vector<float> v2 {2};
+		insertSamples(classifier,"woman","height",v2);	
+	
+		classifier.train();
+		
+		ml::GaussianInfo info = classifier.getGaussianInfo("male","height");	
+		REQUIRE(info.values.size() == 1);
+		
+		REQUIRE(info.values[0] == 1);
+
+
+		ml::GaussianInfo info2 = classifier.getGaussianInfo("woman","height");	
+		REQUIRE(info2.values.size() == 1);
+		REQUIRE(info2.values[0] == 2);
 	};
 
 };
