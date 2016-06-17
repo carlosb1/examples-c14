@@ -75,7 +75,6 @@ TEST_CASE("testing add information","[naive_bayes_classifier]") {
 		
 		REQUIRE(info.values[0] == 1);
 
-
 		ml::GaussianInfo info2 = classifier.getGaussianInfo("woman","height");	
 		REQUIRE(info2.values.size() == 1);
 		REQUIRE(info2.values[0] == 2);

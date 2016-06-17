@@ -61,14 +61,22 @@ namespace ml {
 			std::vector<std::pair<std::string,Sample>> recollectedData; 
 			std::map<std::string,std::map<std::string,GaussianInfo>> gaussianTable; 
 		public:		
+
+			inline bool existTypeGaussian(std::string type) {
+				return (gaussianTable.find(type) == gaussianTable.end());
+			
+			};
+
+
 			inline void addRow(std::string type, Sample & param) {
 				this->recollectedData.push_back(std::make_pair(type,param));
 			};
 			inline GaussianInfo getGaussianInfo(std::string type, std::string parameter) {
 				/* Guards */
-				if (gaussianTable.find(type) == gaussianTable.end()) {
+				if (existTypeGaussian(type)) {
 					return GaussianInfo();
 				}
+
 
 				std::map<std::string,GaussianInfo> info = gaussianTable[type];
 				if (info.find(parameter) == info.end()) {
@@ -78,26 +86,24 @@ namespace ml {
 				return gaussianTable[type][parameter];
 
 			}
-			//TODO add clean method
 			void train () {
 				for (auto data: this->recollectedData) {
 					std::string key = data.first;
 					Sample sample = data.second;
 				
-					//TODO set up a correct constructor
 					Row row;
 					GaussianInfo gaussianInfo;
-					if (this->gaussianTable.find(key) == this->gaussianTable.end()) {
+					if (existTypeGaussian(key)) {
 						gaussianInfo = GaussianInfo(sample.second);
 					}
 					else {
 						row = this->gaussianTable[key];
 						gaussianInfo = row[sample.first];
 						gaussianInfo.values.push_back(sample.second);
-						double mean = ml::mean(gaussianInfo.values);
-						double variance = ml::variance(mean,gaussianInfo.values);
-						gaussianInfo.mean = mean;
-						gaussianInfo.variance = variance;
+						//TODO it is calculating all the time the mean and the variance...
+						//TODO it can be improved
+						gaussianInfo.mean  = ml::mean(gaussianInfo.values);
+						gaussianInfo.variance = ml::variance(gaussianInfo.mean,gaussianInfo.values);
 
 					}
 					row[sample.first]= gaussianInfo;
