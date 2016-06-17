@@ -8,7 +8,7 @@ TEST_CASE("Add row correctly","[naive_bayes_classifier]") {
 	ml::Sample sample = std::make_pair("height",inputData);
 	classifier.addRow("male",sample);
 
-	//TODO move this test
+	//TODO isolate testing
 	classifier.train();
 	ml::GaussianInfo info = classifier.getGaussianInfo("male","height");
 	REQUIRE(info.mean == inputData);
@@ -24,6 +24,9 @@ TEST_CASE("Add two rows correctly","[naive_bayes_classifier]") {
 	//TODO ADD SETUP
 	ml::NaiveBayesClassifier classifier;
 
+	//TODO add method to automatise the creation
+	// of samples and added them
+	
 	ml::Sample sample = createSample("height",1);
 	classifier.addRow("male",sample);
 	
@@ -39,4 +42,30 @@ TEST_CASE("Add two rows correctly","[naive_bayes_classifier]") {
 	REQUIRE(info.values[1] == 1.5);
 	REQUIRE(info.variance ==  0.25 );
 };
+
+TEST_CASE("Add different type of samples for testing test","[naive_bayes_classifier]") {
+	//TODO ADD SETUP
+	ml::NaiveBayesClassifier classifier;
+
+	ml::Sample sample = createSample("height",1);
+	classifier.addRow("male",sample);	
+	ml::Sample sample2 = createSample("height",1.5);
+	classifier.addRow("male",sample2);
+
+	//TODO add test for not finding type of sample
+	ml::Sample sample3 = createSample("weight",1);
+	classifier.addRow("male",sample3);
+
+
+
+	classifier.train();
+	ml::GaussianInfo info = classifier.getGaussianInfo("male","weight");
+	
+	REQUIRE(info.values.size() == 1);
+
+	REQUIRE(info.values[0] == 1);
+	REQUIRE(info.variance ==  0 );
+	REQUIRE(info.mean ==  1 );
+};
+
 
