@@ -25,7 +25,7 @@ TEST_CASE("testing add information","[naive_bayes_classifier]") {
 		ml::GaussianInfo info = classifier.getGaussianInfo("male","height");
 		REQUIRE(info.mean == 1.);
 		REQUIRE(info.values[0] == 1.);
-		REQUIRE(info.variance ==  1.);
+		REQUIRE(info.variance ==  0.);
 	};
 	SECTION("Add two rows correctly") {
 		std::vector<float> v {1., 1.5};
@@ -80,6 +80,48 @@ TEST_CASE("testing add information","[naive_bayes_classifier]") {
 		REQUIRE(info2.values[0] == 2);
 	};
 
+	SECTION("Test simple prediction") {
+		std::vector<float> v {1};
+		insertSamples(classifier,"male","height",v);	
+	
+		classifier.train();
+
+		ml::Sample sample = createSample("height",1.0);
+		std::vector<ml::Sample> valuesPredicts{sample};
+		ml::PredictedResult predictedValue =  classifier.predict(valuesPredicts);
+		
+		REQUIRE(predictedValue.first == "male");
+	};
+
+	SECTION("Test prediction two values but without variance") {
+		std::vector<float> v {4};
+		insertSamples(classifier,"male","height",v);	
+		std::vector<float> v2 {2};
+		insertSamples(classifier,"woman","height",v2);	
+		
+		classifier.train();
+
+		ml::Sample sample = createSample("height",2.0);
+		std::vector<ml::Sample> valuesPredicts{sample};
+		ml::PredictedResult predictedValue =  classifier.predict(valuesPredicts);
+		
+		REQUIRE(predictedValue.first == "male");
+		REQUIRE(predictedValue.second == 0.5);
+	};	
+	SECTION("Test prediction two values but with variance") {
+		std::vector<float> v {4,5};
+		insertSamples(classifier,"male","height",v);	
+		std::vector<float> v2 {1,2};
+		insertSamples(classifier,"woman","height",v2);	
+		
+		classifier.train();
+
+		ml::Sample sample = createSample("height",2.0);
+		std::vector<ml::Sample> valuesPredicts{sample};
+		ml::PredictedResult predictedValue =  classifier.predict(valuesPredicts);
+		
+		REQUIRE(predictedValue.first == "woman");
+	};
 };
 
 
