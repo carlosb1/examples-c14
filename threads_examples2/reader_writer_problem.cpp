@@ -4,41 +4,30 @@
 #include <chrono>
 #include <mutex>
 
-
 std::atomic_bool finish_reader(false);
 std::atomic_bool finish_writer(false);
 
 
-void reader() {
-	while (!finish_reader) {
-		std::cout  <<"I am reading" << '\n';
-//		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	std::cout << "It is finished reader" << '\n';
-}
-void writer() {
-	while(!finish_writer) {
-		std::cout << "I am writing" << '\n';
-//		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	}
-	std::cout << "It is finished writer" << '\n';
-}
+/* simple mutex option */
 std::mutex mutex;
-
 void lock_reader() {
-	mutex.lock();	
-	reader();
-	mutex.unlock();
+	while (!finish_reader) {
+		mutex.lock();	
+		std::cout  <<"I am reading" << '\n';
+		mutex.unlock();
+	}
 
 
 }
 void lock_writer() {
-	mutex.lock();
-	writer();
-	mutex.unlock();
-
+	while(!finish_writer) {
+		mutex.lock();
+		std::cout << "I am writing" << '\n';
+		mutex.unlock();
+	}
 }
 
+/* solution priority reader starvation writers */
 std::mutex mutex_reader;
 std::mutex mutex_writer;
 
@@ -75,16 +64,60 @@ void multiple_lock_writer() {
 }
 
 
-void versionWithoutSync() {
-	std::thread tReader(reader);
-	std::thread tWriter(writer);
-	std::this_thread::sleep_for(std::chrono::seconds(2));
-		
-	finish_reader = true;
-	finish_writer = true;
-	tReader.join();
-	tWriter.join();
+std::mutex x,y,z;
+std::mutex rsem, wsem;
+
+int count_readers_readers=0;
+int count_readers_writers=0;
+void writer_priority_lock_reader(int num_reader) {
+	
+	while (!finish_reader) {
+		//other readers
+		z.lock();
+		//give writer priority
+		rsem.lock();
+		//protect counter update
+		x.lock();
+		count_readers_readers++;
+		if (count_readers_readers==1) {
+			wsem.lock();	
+		}
+		x.unlock();	
+		rsem.unlock();
+		z.unlock();
+
+		std::cout  <<"I am reading  reader: "<< num_reader << '\n';
+	
+		x.lock();
+		count_readers_readers--;
+		if (count_readers_readers==0) {
+			wsem.unlock();	
+		}
+		x.unlock();	
+	}
+
+
 }
+void writer_priority_lock_writer() {
+	while(!finish_writer) {
+		y.lock();
+		count_readers_writers++;
+		if (count_readers_writers==1) {
+			rsem.lock();	
+		}
+		y.unlock();	
+		std::cout << "I am writing" << '\n';
+		
+		y.lock();
+		count_readers_writers--;
+		if (count_readers_writers==0) {
+			rsem.unlock();	
+		}
+		y.unlock();	
+	}
+
+}
+
 
 void versionLockSync() {
 	std::thread tWriter(lock_writer);
@@ -116,8 +149,8 @@ void versionMultipleLockSync() {
 
 
 
+
 int main () {
-//	versionWithoutSync();
 //	versionLockSync();
 	versionMultipleLockSync();
 }
