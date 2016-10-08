@@ -17,8 +17,13 @@ set( SRCFILES
 	#	./reader_writer_problem.cpp
 		./active_object_problem.cpp
 	)
+set( SRCFILES2
+		monitor_template.cpp
+	)
 
 add_executable(test ${SRCFILES} )
+add_executable(test2 ${SRCFILES2} )
 #TODO Add find_library for each  link
 #target_link_libraries (test  pthread )
 target_link_libraries (test benchmark pthread )
+target_link_libraries (test2 benchmark pthread )
