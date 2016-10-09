@@ -21,9 +21,16 @@ set( SRCFILES2
 		monitor_template.cpp
 	)
 
+set( SRCFILES3
+		half_sync_async_problem.cpp
+	)
+
 add_executable(test ${SRCFILES} )
 add_executable(test2 ${SRCFILES2} )
+add_executable(test3 ${SRCFILES3} )
+
 #TODO Add find_library for each  link
 #target_link_libraries (test  pthread )
 target_link_libraries (test benchmark pthread )
 target_link_libraries (test2 benchmark pthread )
+target_link_libraries (test3 benchmark pthread )
