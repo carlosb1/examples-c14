@@ -73,6 +73,8 @@ flags = [
 '-I',
 '.',
 '-I',
+'./threads_examples',
+'-I',
 './ClangCompleter',
 '-isystem',
 './gmock-1.7.0/gtest',

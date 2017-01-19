@@ -5,18 +5,30 @@
 #include <string>
 #include <numeric>
 #include <algorithm>
+#include <iostream>
+#include <cmath>
 
 namespace ml {
 	
-	typedef std::pair<std::string,float> Sample;
-
 	struct GaussianInfo{
 		double mean;
 		double variance;
 		std::vector<float> values;
-		
+		bool isNull;
+		GaussianInfo(float value) {
+			values.push_back(value);
+			mean = value;
+			variance = 0;
+			isNull = false;
+		}
+		GaussianInfo() {
+			isNull=true;
+		}
 	};
+
+	typedef std::pair<std::string,float> Sample;
 	typedef std::map<std::string,GaussianInfo> Row;
+	typedef std::pair<std::string,double> PredictedResult; 
 
 	/**
 	 * Implements mean function
@@ -46,33 +58,111 @@ namespace ml {
 			std::vector<std::pair<std::string,Sample>> recollectedData; 
 			std::map<std::string,std::map<std::string,GaussianInfo>> gaussianTable; 
 		public:		
-			inline void addRow(std::string & type, Sample & param) {
+
+			inline bool notExistTypeGaussian(std::string type) {
+				return (gaussianTable.find(type) == gaussianTable.end());
+			
+			};
+			inline double getProbability(double mean, double variance, double element ) {
+				double multipl = 1.0/std::sqrt(2.0*variance*M_PI);
+				double result =  multipl * std::exp(-std::pow(element - mean, 2.0) / (2.0*variance));
+				return result;
+			}
+
+
+
+			inline void addRow(std::string type, Sample & param) {
 				this->recollectedData.push_back(std::make_pair(type,param));
 			};
-			inline GaussianInfo getGaussianInfo(std::string & type, std::string & parameter) {
-				//TODO add checker
+			inline GaussianInfo getGaussianInfo(std::string type, std::string parameter) {
+				/* Guards */
+				if (notExistTypeGaussian(type)) {
+					return GaussianInfo();
+				}
+
+
+				std::map<std::string,GaussianInfo> info = gaussianTable[type];
+				if (info.find(parameter) == info.end()) {
+					return GaussianInfo();
+				}
+
 				return gaussianTable[type][parameter];
 
 			}
-			//TODO add clean method
 			void train () {
 				for (auto data: this->recollectedData) {
 					std::string key = data.first;
 					Sample sample = data.second;
 				
-					//TODO set up a correct constructor
 					Row row;
 					GaussianInfo gaussianInfo;
-					gaussianInfo.values.push_back(sample.second);
-					gaussianInfo.mean = sample.second;
-					gaussianInfo.variance = sample.second;
+					if (notExistTypeGaussian(key)) {
+						gaussianInfo = GaussianInfo(sample.second);
+					}
+					else {
+						row = this->gaussianTable[key];
+						gaussianInfo = row[sample.first];
+						gaussianInfo.values.push_back(sample.second);
+						//TODO it is calculating all the time the mean and the variance...
+						//TODO it can be improved
+						gaussianInfo.mean  = ml::mean(gaussianInfo.values);
+						gaussianInfo.variance = ml::variance(gaussianInfo.mean,gaussianInfo.values);
+
+					}
 					row[sample.first]= gaussianInfo;
 					this->gaussianTable[key]=row;
 				}
 
 			}
-			std::string predict(Sample & sample) {
-				return std::string();	
+
+			inline bool notExistValue(std::map<std::string,GaussianInfo> & values, std::string name) {
+				return values.find(name) == values.end();
+			}
+			inline bool isNotCalculable(GaussianInfo & gaussianInfo) {
+				return (gaussianInfo.values.size()==1);
+			}
+
+			double calculateProbability (std::map<std::string,GaussianInfo> & values , std::vector<Sample> & samples, double probElem) {
+					double accumulateProb = probElem;
+					for (auto sample: samples) {
+						std::string name = sample.first;
+						/* Check if it exists */
+						if (notExistValue(values,name)) {
+							continue;
+						}	
+						float value = sample.second;
+						GaussianInfo gaussianInfo = values[name];
+						if (isNotCalculable(gaussianInfo)) {
+							continue;
+						}
+						//TODO add test for this operation
+						double probability = getProbability(gaussianInfo.mean,gaussianInfo.variance,value);
+						accumulateProb*=probability;
+					}
+					return accumulateProb;
+			}
+
+
+
+			PredictedResult predict(std::vector<Sample> & samples) {
+				double probElem = 1.0 / (double)this->gaussianTable.size();
+				PredictedResult predictedResult;
+				predictedResult.second = 0;
+				for (const auto &pairValues: this->gaussianTable) {
+					double accumulateProb = probElem;
+					std::string key = pairValues.first;
+					std::map<std::string,GaussianInfo> values = pairValues.second;
+					//TODO test one type without samples
+					//analyse sample
+					accumulateProb = calculateProbability(values,samples,probElem);
+
+					if (predictedResult.second < accumulateProb) {
+						predictedResult.first= key;
+						predictedResult.second = accumulateProb;
+					}
+				}
+
+				return predictedResult;	
 			}
 				
 		};
