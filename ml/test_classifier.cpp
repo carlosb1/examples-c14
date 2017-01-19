@@ -34,10 +34,10 @@ TEST_CASE("Add two rows correctly","[naive_bayes_classifier]") {
 	classifier.train();
 	std::string param("height");
 	ml::GaussianInfo info = classifier.getGaussianInfo(type,param);
-	REQUIRE(info.mean == 1.5);
 	REQUIRE(info.values.size() == 2);
 	REQUIRE(info.values[0] == 1);
 	REQUIRE(info.values[1] == 1.5);
+	REQUIRE(info.mean == 1.5);
 	REQUIRE(info.variance ==  (1.25 / 2.0) );
 };
 
