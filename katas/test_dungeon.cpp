@@ -50,7 +50,8 @@ struct Dungeon  {
 	}
 
 	std::pair <int,int> getEnter() {
-		return std::make_pair(0,0);
+		//TODO It can not be repeated
+		return doorGenerator->make(size);
 	}
 
 };
@@ -68,15 +69,17 @@ TEST_CASE ("An empty dungeon is initialised correctly", "[empty_dungeon]")  {
 
 TEST_CASE("A dungeon should","[dungeon]") {
 	SECTION("with a size 2, contains and enter and exit") {
-		std::shared_ptr<DoorGenerator> fakeDoorGenerator =  std::make_shared<FakeDoorGenerator>();
-		Dungeon dungeon(fakeDoorGenerator,2);
+		std::shared_ptr<FakeDoorGenerator> fakeDoorGenerator =  std::make_shared<FakeDoorGenerator>();
+		std::shared_ptr<DoorGenerator> doorGenerator =  std::dynamic_pointer_cast<DoorGenerator>(fakeDoorGenerator);
+		Dungeon dungeon(doorGenerator,2);
+		fakeDoorGenerator->door = std::make_pair<int,int>(0,0);
 		std::pair<int,int>  exit = dungeon.getExit();
-		//TODO refact. creating abstraction class
-		REQUIRE(exit.first>=0 );
-		REQUIRE(exit.second>=0 );
+		REQUIRE(exit.first==0 );
+		REQUIRE(exit.second==0 );
+		fakeDoorGenerator->door = std::make_pair<int,int>(1,1);
 		std::pair<int,int> enter = dungeon.getEnter();
-		REQUIRE(enter.first >=0);
-		REQUIRE(enter.second >=0);
+		REQUIRE(enter.first ==1);
+		REQUIRE(enter.second==1);
 	}
 
  }	
