@@ -2,6 +2,9 @@
 #include <catch.hpp>
 #include <utility>
 
+
+//static std::pair<int,int> Empty
+
 struct Dungeon  {
 
 	int size;
@@ -16,11 +19,23 @@ struct Dungeon  {
 
 //TODO Check incorrect dungeons (negative)
 
-TEST_CASE ("An empty dungeon is initialised correctly ", "[dungeon]")  {
+TEST_CASE ("An empty dungeon is initialised correctly", "[empty_dungeon]")  {
 	Dungeon dungeon(1);
 	std::pair<int,int> exit = dungeon.getExit();
 	REQUIRE (exit.first == 0);
 	REQUIRE (exit.second == 0);
-		
 }
+
+TEST_CASE("A dungeon should","[dungeon]") {
+	SECTION("with a size 2, contains and enter and exit") {
+		Dungeon dungeon(2);
+		std::pair<int,int>  exit = dungeon.getExit();
+		//TODO refact. creating abstraction class
+		REQUIRE (exit.first>=0 );
+		REQUIRE (exit.second>=0 );
+
+			
+	
+	}
+ }	
 
