@@ -96,13 +96,12 @@ TEST_CASE("A dungeon should","[dungeon]") {
 		REQUIRE(exit.id==1);
 	}
 
-	SECTION("with permits enter a new explorer in the position 0, 0") {
+	SECTION("with permits enter a new explorer in the position 0") {
 		dungeon.enter();
 		Cell posic = dungeon.getPlace();
 		REQUIRE(posic.id==0 );
 
 	}
-
 
 	
 
