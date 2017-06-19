@@ -54,6 +54,14 @@ struct Dungeon  {
 		return doorGenerator->make(size);
 	}
 
+	void enter() {
+	
+	}
+
+	std::pair<int,int> getPlace() {
+		return std::make_pair(0,0);
+	}
+
 };
 
 
@@ -68,7 +76,9 @@ TEST_CASE ("An empty dungeon is initialised correctly", "[empty_dungeon]")  {
 }
 
 TEST_CASE("A dungeon should","[dungeon]") {
-	SECTION("with a size 2, contains and enter and exit") {
+	SECTION("with a size >=2, contains and enter and exit") {
+
+		//TODO set up for the creation of doors
 		std::shared_ptr<FakeDoorGenerator> fakeDoorGenerator =  std::make_shared<FakeDoorGenerator>();
 		std::shared_ptr<DoorGenerator> doorGenerator =  std::dynamic_pointer_cast<DoorGenerator>(fakeDoorGenerator);
 		Dungeon dungeon(doorGenerator,2);
@@ -78,9 +88,31 @@ TEST_CASE("A dungeon should","[dungeon]") {
 		REQUIRE(exit.second==0 );
 		fakeDoorGenerator->door = std::make_pair<int,int>(1,1);
 		std::pair<int,int> enter = dungeon.getEnter();
-		REQUIRE(enter.first ==1);
+		
+		REQUIRE(enter.first==1);
 		REQUIRE(enter.second==1);
 	}
+
+	SECTION("with permits enter a new explorer in the position 0, 0") {
+		std::shared_ptr<FakeDoorGenerator> fakeDoorGenerator =  std::make_shared<FakeDoorGenerator>();
+		std::shared_ptr<DoorGenerator> doorGenerator =  std::dynamic_pointer_cast<DoorGenerator>(fakeDoorGenerator);
+		Dungeon dungeon(doorGenerator,2);
+		fakeDoorGenerator->door = std::make_pair<int,int>(0,0);
+
+		dungeon.enter();
+		std::pair<int,int> posic = dungeon.getPlace();
+		
+		REQUIRE(posic.first==0 );
+		REQUIRE(posic.second==0 );
+
+		
+
+
+
+	}
+
+
+	
 
  }	
 
