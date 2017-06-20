@@ -57,10 +57,12 @@ struct Dungeon  {
 
 	Cell entrance;
 	Cell exit;
+	bool foundExit;
 	Dungeon(std::shared_ptr<DoorGenerator> & doorGenerator_, int size_=0): size(size_), doorGenerator(doorGenerator_){
 		std::pair<Cell, Cell> doors = doorGenerator->make(size);
 		this->entrance = doors.first;
 		this->exit = doors.second;
+		this->foundExit = false;
 	};
 
  	Cell getExit() {
@@ -78,6 +80,15 @@ struct Dungeon  {
 	Cell getPlace() {
 		return Cell(0);
 	}
+
+	bool isExit() {
+		return foundExit;
+	}
+
+	void visit (int numDoor) {
+		this->foundExit = true;
+	}
+
 	std::vector<door>  getDoors() {
 		std::vector<door> doors { wall,open,open,wall };
 		return doors; 
@@ -98,6 +109,7 @@ TEST_CASE ("An empty dungeon is initialised correctly", "[empty_dungeon]")  {
 TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 	std::shared_ptr<DoorGenerator> doorGenerator =  std::make_shared<FakeDoorGenerator>(Cell(0),Cell(1));
 	Dungeon dungeon(doorGenerator,2);
+	
 	SECTION("with a size >=2, contains and enter and exit") {
 		Cell enter = dungeon.getEnter();
 		REQUIRE(enter.id==0);
@@ -110,6 +122,7 @@ TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 		Cell posic = dungeon.getPlace();
 		REQUIRE(posic.id==0 );
 	}
+
 	SECTION("with enters in see available doors") {
 		dungeon.enter();
 		std::vector<door> doors = dungeon.getDoors();
@@ -120,13 +133,17 @@ TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 		REQUIRE(doors[3]==wall);
 
 	}
+
+	//TODO good practice force to implement 
 	SECTION("with enters an choose first door") {
 		dungeon.enter();
+		REQUIRE(dungeon.isExit()==false);
 		std::vector<door> doors = dungeon.getDoors();
 		dungeon.visit(0);
-		REQUIRE(dungeon.exit()==true);
-		
+		REQUIRE(dungeon.isExit()==true);
 	}
+
+
 	
 
 
