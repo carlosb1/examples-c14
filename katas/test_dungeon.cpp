@@ -120,6 +120,13 @@ TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 		REQUIRE(doors[3]==wall);
 
 	}
+	SECTION("with enters an choose first door") {
+		dungeon.enter();
+		std::vector<door> doors = dungeon.getDoors();
+		dungeon.visit(0);
+		REQUIRE(dungeon.exit()==true);
+		
+	}
 	
 
 
