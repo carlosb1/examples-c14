@@ -9,9 +9,10 @@ include_directories ("./include")
 
 link_directories("/home/carlos/c-workspace/examples-c14/katas/lib")
 
+
 #Add flags
 #Debug flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -DNDEBUG -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_LTO=true")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++1y -DNDEBUG -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_LTO=true ")
 # Target system
 set( SRCFILES
 		./test_dungeon.cpp

@@ -37,13 +37,18 @@ struct RandomDoorGenerator: DoorGenerator {
 
 	std::pair<Cell,Cell> make(int size) {
 		std::srand(std::time(0));
-		int random_variable = (int)(std::rand() % size);
-		
+		int random_variable = (int)(std::rand() % size);	
 	}
+
+
 
 
 };
 
+enum door {
+	wall=0,
+	open=1,
+};
 
 
 struct Dungeon  {
@@ -73,6 +78,10 @@ struct Dungeon  {
 	Cell getPlace() {
 		return Cell(0);
 	}
+	std::vector<door>  getDoors() {
+		std::vector<door> doors { wall,open,open,wall };
+		return doors; 
+	}
 
 };
 
@@ -86,7 +95,7 @@ TEST_CASE ("An empty dungeon is initialised correctly", "[empty_dungeon]")  {
 	REQUIRE (exit.id == 0);
 }
 
-TEST_CASE("A dungeon should","[dungeon]") {
+TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 	std::shared_ptr<DoorGenerator> doorGenerator =  std::make_shared<FakeDoorGenerator>(Cell(0),Cell(1));
 	Dungeon dungeon(doorGenerator,2);
 	SECTION("with a size >=2, contains and enter and exit") {
@@ -100,10 +109,21 @@ TEST_CASE("A dungeon should","[dungeon]") {
 		dungeon.enter();
 		Cell posic = dungeon.getPlace();
 		REQUIRE(posic.id==0 );
+	}
+	SECTION("with enters in see available doors") {
+		dungeon.enter();
+		std::vector<door> doors = dungeon.getDoors();
+		REQUIRE(doors.size()==4);
+		REQUIRE(doors[0]==wall);
+		REQUIRE(doors[1]==open);
+		REQUIRE(doors[2]==open);
+		REQUIRE(doors[3]==wall);
 
 	}
-
 	
 
- }	
+
+ }
+
+
 
