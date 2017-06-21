@@ -97,11 +97,6 @@ struct Dungeon  {
 		return this->entrance;
 	}
 
-	//TODO it is necessary ?
-	void enter() {
-	
-	}
-
 	Cell getPlace() {
 		return Cell(0);
 	}
@@ -111,6 +106,7 @@ struct Dungeon  {
 	}
 
 	void visit (int numDoor) {
+		//TODO check to avoid wrong doors
 		for (std::shared_ptr<Cell> cell: this->current->connectedCells) {
 			if (cell->posic == numDoor) {
 				this->current = cell;
@@ -153,13 +149,11 @@ TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 	}
 
 	SECTION("with permits enter a new explorer in the position 0") {
-		dungeon.enter();
 		Cell posic = dungeon.getPlace();
 		REQUIRE(posic.id==0 );
 	}
 
 	SECTION("with enters in see available doors") {
-		dungeon.enter();
 		std::vector<door> doors = dungeon.getDoors();
 		REQUIRE(doors.size()==4);
 		REQUIRE(doors[0]==wall);
@@ -171,7 +165,6 @@ TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 
 	//TODO good practicei? force to implement 
 	SECTION("with enters an choose first door") {
-		dungeon.enter();
 		REQUIRE(dungeon.isExit()==false);
 		std::vector<door> doors = dungeon.getDoors();
 		dungeon.visit(1);
@@ -179,13 +172,11 @@ TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 	}
 
 	SECTION("with enters a choose first door and it arreives to the end") {
-		dungeon.enter();
 		dungeon.visit(1);
 		REQUIRE(dungeon.isExit()==true);
 	}
 
 	SECTION("with enters choose first and first door and it arrives to the end") {
-		dungeon.enter();
 		REQUIRE(dungeon.isExit()==false);
 		dungeon.visit(1);
 		REQUIRE(dungeon.isExit()==true);
@@ -200,7 +191,6 @@ TEST_CASE("A dungeon with three cells should","[dungeon]") {
 	Dungeon dungeon(doorGenerator,3);
 
 	SECTION("with enters choose first and first door and it arrives to the end") {
-		dungeon.enter();
 		dungeon.visit(1);
 		REQUIRE(dungeon.isExit()==false);
 		dungeon.visit(1);
