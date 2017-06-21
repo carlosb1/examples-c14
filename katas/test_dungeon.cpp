@@ -18,14 +18,14 @@ struct Cell {
 
 //TODO check random door generator
 struct DoorGenerator {
-	virtual std::pair<Cell,Cell> make(int size)  = 0;
+	virtual std::pair<Cell,Cell> make(int numberCells)  = 0;
 };
 
 struct FakeDoorGenerator: DoorGenerator {
 	Cell entrance;
 	Cell exit;
 	FakeDoorGenerator(Cell entrance_, Cell exit_): entrance(entrance_), exit(exit_) {};
-	std::pair<Cell, Cell> make(int size) {
+	std::pair<Cell, Cell> make(int numberCells) {
 		return std::make_pair(entrance,exit); 
 	};
 };
@@ -35,9 +35,9 @@ struct RandomDoorGenerator: DoorGenerator {
 	RandomDoorGenerator() {
 	};
 
-	std::pair<Cell,Cell> make(int size) {
+	std::pair<Cell,Cell> make(int numberCells) {
 		std::srand(std::time(0));
-		int random_variable = (int)(std::rand() % size);	
+		int random_variable = (int)(std::rand() % numberCells);	
 	}
 
 };
@@ -50,7 +50,7 @@ enum door {
 
 
 struct Dungeon  {
-	int size;
+	int numberCells;
 	std::shared_ptr<DoorGenerator> doorGenerator;
 
 	Cell entrance;
@@ -59,9 +59,9 @@ struct Dungeon  {
 	bool foundExit;
 	int countId=0;
 
-	//TODO size refactorization!
-	Dungeon(std::shared_ptr<DoorGenerator> & doorGenerator_, int size_=0): size(size_), doorGenerator(doorGenerator_){
-		std::pair<Cell, Cell> doors = doorGenerator->make(size);
+	//TODO numberCells refactorization!
+	Dungeon(std::shared_ptr<DoorGenerator> & doorGenerator_, int numberCells_=0): numberCells(numberCells_), doorGenerator(doorGenerator_){
+		std::pair<Cell, Cell> doors = doorGenerator->make(numberCells);
 		this->entrance = doors.first;
 		this->exit = doors.second;
 		this->foundExit = false;
@@ -72,7 +72,7 @@ struct Dungeon  {
 		std::shared_ptr<Cell> ptrEntrance = std::make_shared<Cell>(this->entrance);
 		std::shared_ptr<Cell> parentCell = ptrEntrance;
 		std::shared_ptr<Cell> nextCell = ptrEntrance;
-		for (int index=0; index < (size-2); index++) {
+		for (int index=0; index < (numberCells-2); index++) {
 			nextCell = std::make_shared<Cell>(countId,1);
 			countId++;
 			parentCell->connectedCells.push_back(nextCell);
@@ -141,7 +141,7 @@ TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 	std::shared_ptr<DoorGenerator> doorGenerator =  std::make_shared<FakeDoorGenerator>(Cell(0),Cell(1));
 	Dungeon dungeon(doorGenerator,2);
 	
-	SECTION("with a size >=2, contains and enter and exit") {
+	SECTION("with a numberCells >=2, contains and enter and exit") {
 		Cell enter = dungeon.getEnter();
 		REQUIRE(enter.id==0);
 		Cell  exit = dungeon.getExit();
