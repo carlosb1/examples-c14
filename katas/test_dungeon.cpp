@@ -8,8 +8,9 @@
 //static Cell Empty
 
 struct Cell {
-	Cell(int id_=-1): id(id_) {};
+	Cell(int id_=-1, int posic_=-1): id(id_), posic(posic_) {};
 	int id;
+	int posic;
 	std::vector<std::shared_ptr<Cell>> connectedCells;
 };
 
@@ -32,16 +33,12 @@ struct FakeDoorGenerator: DoorGenerator {
 //TODO pending to test and finish
 struct RandomDoorGenerator: DoorGenerator {
 	RandomDoorGenerator() {
-	
 	};
 
 	std::pair<Cell,Cell> make(int size) {
 		std::srand(std::time(0));
 		int random_variable = (int)(std::rand() % size);	
 	}
-
-
-
 
 };
 
@@ -51,21 +48,48 @@ enum door {
 };
 
 
+
 struct Dungeon  {
 	int size;
 	std::shared_ptr<DoorGenerator> doorGenerator;
 
 	Cell entrance;
 	Cell exit;
+	std::shared_ptr<Cell> current;
 	bool foundExit;
+	int countId=0;
+
+	//TODO size refactorization!
 	Dungeon(std::shared_ptr<DoorGenerator> & doorGenerator_, int size_=0): size(size_), doorGenerator(doorGenerator_){
 		std::pair<Cell, Cell> doors = doorGenerator->make(size);
 		this->entrance = doors.first;
 		this->exit = doors.second;
 		this->foundExit = false;
+
+		//TODO refactor this code
+		entrance.id=countId;
+		countId++;
+		std::shared_ptr<Cell> ptrEntrance = std::make_shared<Cell>(this->entrance);
+		std::shared_ptr<Cell> parentCell = ptrEntrance;
+		std::shared_ptr<Cell> nextCell = ptrEntrance;
+		for (int index=0; index < (size-2); index++) {
+			nextCell = std::make_shared<Cell>(countId,1);
+			countId++;
+			parentCell->connectedCells.push_back(nextCell);
+		}
+		exit.id=countId;
+		//TODO hardcoded
+		exit.posic=1;
+		countId++;
+		nextCell->connectedCells.push_back(std::make_shared<Cell>(this->exit));
+	
+		this->current = ptrEntrance;
 	};
 
- 	Cell getExit() {
+
+ 	
+	
+	Cell getExit() {
 		return this->exit;
 	}
 
@@ -73,6 +97,7 @@ struct Dungeon  {
 		return this->entrance;
 	}
 
+	//TODO it is necessary ?
 	void enter() {
 	
 	}
@@ -86,7 +111,17 @@ struct Dungeon  {
 	}
 
 	void visit (int numDoor) {
-		this->foundExit = true;
+		for (std::shared_ptr<Cell> cell: this->current->connectedCells) {
+			if (cell->posic == numDoor) {
+				this->current = cell;
+				if (this->current->id == this->exit.id) {
+					this->foundExit = true;
+				}
+				return;
+			}
+		}
+
+
 	}
 
 	std::vector<door>  getDoors() {
@@ -103,7 +138,7 @@ TEST_CASE ("An empty dungeon is initialised correctly", "[empty_dungeon]")  {
 	std::shared_ptr<DoorGenerator> fakeDoorGenerator =  std::make_shared<FakeDoorGenerator>(Cell(0),Cell(0));
 	Dungeon dungeon(fakeDoorGenerator,1);
 	Cell exit = dungeon.getExit();
-	REQUIRE (exit.id == 0);
+	REQUIRE (exit.id == 1);
 }
 
 TEST_CASE("A dungeon with only two cells should","[dungeon]") {
@@ -134,20 +169,44 @@ TEST_CASE("A dungeon with only two cells should","[dungeon]") {
 
 	}
 
-	//TODO good practice force to implement 
+	//TODO good practicei? force to implement 
 	SECTION("with enters an choose first door") {
 		dungeon.enter();
 		REQUIRE(dungeon.isExit()==false);
 		std::vector<door> doors = dungeon.getDoors();
-		dungeon.visit(0);
+		dungeon.visit(1);
 		REQUIRE(dungeon.isExit()==true);
 	}
 
+	SECTION("with enters a choose first door and it arreives to the end") {
+		dungeon.enter();
+		dungeon.visit(1);
+		REQUIRE(dungeon.isExit()==true);
+	}
 
+	SECTION("with enters choose first and first door and it arrives to the end") {
+		dungeon.enter();
+		REQUIRE(dungeon.isExit()==false);
+		dungeon.visit(1);
+		REQUIRE(dungeon.isExit()==true);
+	}
 	
 
 
  }
 
+TEST_CASE("A dungeon with three cells should","[dungeon]") {
+	std::shared_ptr<DoorGenerator> doorGenerator =  std::make_shared<FakeDoorGenerator>(Cell(0),Cell(1));
+	Dungeon dungeon(doorGenerator,3);
 
+	SECTION("with enters choose first and first door and it arrives to the end") {
+		dungeon.enter();
+		dungeon.visit(1);
+		REQUIRE(dungeon.isExit()==false);
+		dungeon.visit(1);
+		REQUIRE(dungeon.isExit()==true);
+	}
+	
+
+}
 
