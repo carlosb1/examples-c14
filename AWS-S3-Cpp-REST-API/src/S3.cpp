@@ -12,7 +12,6 @@ void S3::setPrivateKey(string key)
 {
     m_privateKey = key;
 }
-
 string S3::authorize(const string request)
 {
     BYTE digest[20];

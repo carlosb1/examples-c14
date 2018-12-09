@@ -26,6 +26,8 @@ Get all objects from a specific bucket.
 ### bool putObject(const string & file);
 Add a file to your bucket.
 
+### TEST ANSI C CODE
+gcc example.c -I./include/  -L build/src -ls3_wrap -lstdc++
 
 ### TO COMPILE IN RTMP-NGINX-MODULE
 ./configure --with-http_ssl_module --add-module=./nginx-rtmp-module --with-cc-opt="-I/home/ubuntu/test_wrap/include"  --with-ld-opt="-L/home/ubuntu/test_wrap/lib -ls3_wrap -lstdc++"
