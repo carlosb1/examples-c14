@@ -85,6 +85,7 @@ class Node {
 		int id_to_get = this->id;
 		//TODO ADD MY ADDRESS
 		auto near_value = std::make_pair(this->id, this->address);
+		auto dist = distance(id, near_value.first);
 		while (found) {	
 			auto finger_table = get_finger_table_from(near_value);
 			found = false;
@@ -93,9 +94,9 @@ class Node {
 					break;
 				}
 				auto new_dist = distance(id, id_table.first);
-				auto old_dist = distance(id, near_value.first);
-				if (new_dist < old_dist) {
+				if (new_dist < dist && id < id_table.first) {
 					near_value = id_table;
+					dist = new_dist;
 					found=true;
 				}	
 			}
