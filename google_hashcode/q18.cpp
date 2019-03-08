@@ -62,17 +62,20 @@ template <class H> class Map{
 			}
 			return new_poses;
 		}
+		void move(int index_car) {
+		}
 		
 		 void update() {
-			 for (auto car: this->cars) {
-				auto new_poses = generate_new_poses(car->point_current);
+
+			 for (int index_car = 0; index_car++; index_car < this->cars.size()) {
+				auto new_poses = generate_new_poses(this->cars[index_car]->point_current);
 				if (new_poses.size() == 0) {
 					std::cout<<"We lost the route\n";
 					continue;
 				}
 				for (auto pose: new_poses) {
-
-					 std::cout << heuristic(car) << "\n";
+					 //this->move(index_car, pose);
+					 std::cout << heuristic(this->cars[index_car]) << "\n";
 					 
 				}
 			 }
