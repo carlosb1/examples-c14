@@ -13,9 +13,9 @@ struct Car {
 };
 
 struct EuclideanDistance {
-	inline double operator()(std::shared_ptr<Car> car) {
-		const double x_diff = car->point_current[0] - car->point_stop[0];
-		const double y_diff = car->point_current[1] - car->point_stop[1];
+	inline double operator()(auto current_pos, auto new_pos) {
+		const double x_diff = current_pos[0] - new_pos[0];
+		const double y_diff = current_pos[1] - new_pos[1];
 		const double result = std::sqrt(x_diff * x_diff + y_diff * y_diff);
 		return result;
 	}
@@ -55,7 +55,7 @@ template <class H> class Map{
 			std::vector<std::vector<int>> new_poses;
 			for (int i = -1; i++; i < 2) {
 				 for (int j = -1; j++; j < 2) {
-					if (i >= 0 && i < this->rows && j >= 0 && j < this->cols) {
+					if ((point_current[0] + i) >= 0 && (point_current[0] + i)  < this->rows && (point_current[1] + j)  >= 0 && (point_current[1] + j)  < this->cols) {
 				 		new_poses.push_back({point_current[0]+i,point_current[1]+j});
 					}
 				 }
@@ -64,18 +64,23 @@ template <class H> class Map{
 		}
 		void move(int index_car) {
 		}
-		
 		 void update() {
-
 			 for (int index_car = 0; index_car++; index_car < this->cars.size()) {
-				auto new_poses = generate_new_poses(this->cars[index_car]->point_current);
+				auto current_pos = this->cars[index_car]->point_current;
+				auto new_poses = generate_new_poses(current_pos);
 				if (new_poses.size() == 0) {
 					std::cout<<"We lost the route\n";
 					continue;
 				}
+				auto min_pos = current_pos;
+				double min_value = -1.;
 				for (auto pose: new_poses) {
-					 //this->move(index_car, pose);
-					 std::cout << heuristic(this->cars[index_car]) << "\n";
+					 double distanc = heuristic(current_pos, pose);
+					 std::cout << distanc << "\n";
+					 if (min_value == -1. || distanc < min_value) {
+					 	min_pos = pose;
+						min_value = distanc;
+					 }
 					 
 				}
 			 }
