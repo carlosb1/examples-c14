@@ -53,7 +53,7 @@ template <class H> class Map{
 		}
 		std::vector<std::vector<int>> generate_new_poses(auto point_current) {
 			std::vector<std::vector<int>> new_poses;
-			for (int i = -1; i++; i < 2) {
+			for (int i = -1; i < 2; i++) {
 				 for (int j = -1; j++; j < 2) {
 					if ((point_current[0] + i) >= 0 && (point_current[0] + i)  < this->rows && (point_current[1] + j)  >= 0 && (point_current[1] + j)  < this->cols) {
 				 		new_poses.push_back({point_current[0]+i,point_current[1]+j});
@@ -63,9 +63,11 @@ template <class H> class Map{
 			return new_poses;
 		}
 		void move(int index_car) {
+
 		}
 		 void update() {
-			 for (int index_car = 0; index_car++; index_car < this->cars.size()) {
+			 //std::vector<std::pair<>>>
+			 for (int index_car = 0; index_car < this->cars.size(); index_car++) {
 				auto current_pos = this->cars[index_car]->point_current;
 				auto new_poses = generate_new_poses(current_pos);
 				if (new_poses.size() == 0) {
@@ -83,6 +85,10 @@ template <class H> class Map{
 					 }
 					 
 				}
+				if (min_value ==-1) {
+					std::cout<<"We lost the route!\n";
+				}
+
 			 }
 		}
 };
