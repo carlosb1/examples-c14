@@ -3,12 +3,13 @@
 #include <algorithm>
 #include <memory>
 #include <cmath>
+#include <utility>
+
 
 struct Car {
 	std::vector<int> point_start;
 	std::vector<int> point_stop;
 	std::vector<int> point_current;
-
 	Car(std::vector<int> point_start_, std::vector<int> point_stop_): point_start(point_start_), point_stop(point_stop_) {}; 
 };
 
@@ -56,17 +57,28 @@ template <class H> class Map{
 			for (int i = -1; i < 2; i++) {
 				 for (int j = -1; j++; j < 2) {
 					if ((point_current[0] + i) >= 0 && (point_current[0] + i)  < this->rows && (point_current[1] + j)  >= 0 && (point_current[1] + j)  < this->cols) {
-				 		new_poses.push_back({point_current[0]+i,point_current[1]+j});
+						if ( i==0 && j==0) {
+							continue;
+						}
+					 	new_poses.push_back({point_current[0]+i,point_current[1]+j});
 					}
 				 }
 			}
 			return new_poses;
 		}
-		void move(int index_car) {
+		void move(int index_car, std::vector<int> new_pos) {
+			auto car = this->cars[index_car];
+			// clean old posic
+			matrix[car->point_current[0]][car->point_current[1]] = 0;
+			//update matrix, we calculate index
+			matrix[new_pos[0]][new_pos[1]] = index_car + 1;
 
+			car->point_current = new_pos;
+			this->cars[index_car] = car;
+				
 		}
 		 void update() {
-			 //std::vector<std::pair<>>>
+			 std::vector<std::pair<std::vector<int>, int>> selected_poses; 
 			 for (int index_car = 0; index_car < this->cars.size(); index_car++) {
 				auto current_pos = this->cars[index_car]->point_current;
 				auto new_poses = generate_new_poses(current_pos);
@@ -78,8 +90,8 @@ template <class H> class Map{
 				double min_value = -1.;
 				for (auto pose: new_poses) {
 					 double distanc = heuristic(current_pos, pose);
-					 std::cout << distanc << "\n";
 					 if (min_value == -1. || distanc < min_value) {
+						//std::cout << "we found a pose "<< pose[0]<< " " <<pose[1] << "\n";
 					 	min_pos = pose;
 						min_value = distanc;
 					 }
@@ -87,8 +99,13 @@ template <class H> class Map{
 				}
 				if (min_value ==-1) {
 					std::cout<<"We lost the route!\n";
+					continue;
 				}
-
+				selected_poses.push_back(std::make_pair(min_pos, index_car));
+			 }
+			 for (auto selected_pose: selected_poses) {
+				std::cout << "index_car="<< selected_pose.second <<" "<<  selected_pose.first[0] << " " << selected_pose.first[1]<<"\n";
+			 	this->move(selected_pose.second, selected_pose.first);
 			 }
 		}
 };
@@ -104,10 +121,11 @@ int main () {
 	map.appendCar(car2);
 	map.print();
 	
-	int time_clocks = 30;
+	int time_clocks = 10;
 	for (int val = 0;  val < time_clocks; val++) {
 		std::cout << "clock time="<<val<<"\n";
 		map.update();
+		map.print();
 	}
 	//std::for_each(std::begin(matrix), std::end(matrix), [] (auto & v) mutable { for (auto& e: v) std::cin >> e;});
 
